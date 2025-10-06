@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "moduleResolution": "Bundler",
+    "target": "esnext",
+    "module": "ESNext",
+    "declarationDir": "dist-types",
+    "emitDeclarationOnly": true,
+    "lib": ["ESNext"],
+    "skipLibCheck": true,
+    "noEmit": false,
+    "allowJs": false,
+    "checkJs": false,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "types": ["bun-types"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": ".",
+    "composite": false,
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "dist-types"]
+}
