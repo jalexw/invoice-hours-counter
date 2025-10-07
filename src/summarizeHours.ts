@@ -4,6 +4,7 @@ import parseDate from "./parseDate";
 export default function summarizeHours(
   events: readonly IcsEvent[],
   project: string,
+  log: (...vals: unknown[]) => void = console.log,
 ): void {
   let sum: number = 0;
 
@@ -23,9 +24,7 @@ export default function summarizeHours(
       summary = summary.substring(`${project} - `.length);
     }
 
-    console.log(
-      `${start.toDateString()} | ${durationHrs.toFixed(2)} | ${summary}`,
-    );
+    log(`${start.toDateString()} | ${durationHrs.toFixed(2)} | ${summary}`);
     sum += durationHrs;
   }
 

@@ -6,6 +6,7 @@ import {
 } from "@jalexw/calendar-ics-parser";
 import filterEvents, { IFilterOptions } from "./filterEvents";
 import summarizeHours from "./summarizeHours";
+import sortEvents from "./sortEvents";
 
 const cli = new Command();
 
@@ -113,7 +114,7 @@ cli
       `Dropped ${N_EVENTS_DROPPED} events based on filters, leaving ${N_FILTERED_EVENTS} events!`,
     );
 
-    summarizeHours(events, project);
+    summarizeHours(sortEvents(events), project);
   });
 
 async function runInvoiceHoursCounterCli(
