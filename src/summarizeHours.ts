@@ -1,7 +1,10 @@
 import { IcsEvent } from "@jalexw/calendar-ics-parser";
 import parseDate from "./parseDate";
 
-export default function summarizeHours(events: readonly IcsEvent[]): void {
+export default function summarizeHours(
+  events: readonly IcsEvent[],
+  project: string,
+): void {
   let sum: number = 0;
 
   for (const event of events) {
@@ -15,8 +18,13 @@ export default function summarizeHours(events: readonly IcsEvent[]): void {
     const durationS = durationMs / 1000;
     const durationHrs = durationS / 60 / 60;
 
+    let summary: string = event.summary ?? "";
+    if (summary.startsWith(`${project} - `)) {
+      summary = summary.substring(`${project} - `.length);
+    }
+
     console.log(
-      `${start.toDateString()} | ${durationHrs.toFixed(2)} | ${event.summary}`,
+      `${start.toDateString()} | ${durationHrs.toFixed(2)} | ${summary}`,
     );
     sum += durationHrs;
   }
