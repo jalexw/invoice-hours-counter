@@ -5,6 +5,7 @@ import {
   ParsedIcsData,
 } from "@jalexw/calendar-ics-parser";
 import filterEvents, { IFilterOptions } from "./filterEvents";
+import summarizeHours from "./summarizeHours";
 
 const cli = new Command();
 
@@ -63,6 +64,22 @@ cli
     if (typeof project !== "string") {
       console.error("Failed to parse project from --project flag!");
       process.exit(1);
+    } else {
+      console.log("Project: ", project);
+    }
+
+    const after: Date | undefined =
+      typeof options === "object" &&
+      !!options &&
+      "after" in options &&
+      typeof options.after === "string"
+        ? new Date(options.after)
+        : undefined;
+
+    if (after) {
+      console.log("Removing events that came before datetime: ", after);
+    } else {
+      console.log("No --after filter was supplied!");
     }
 
     const parsed: ParsedIcsData = await parseIcsData(fileData, debug);
@@ -86,12 +103,17 @@ cli
 
     const filters: IFilterOptions = {
       project,
+      after,
     };
 
     events = events.filter((e): boolean => filterEvents(e, filters));
     const N_FILTERED_EVENTS: number = events.length;
     const N_EVENTS_DROPPED: number = N_UNFILTERED_EVENTS - N_FILTERED_EVENTS;
-    console.log(`Dropped ${N_EVENTS_DROPPED} events based on filters!`);
+    console.log(
+      `Dropped ${N_EVENTS_DROPPED} events based on filters, leaving ${N_FILTERED_EVENTS} events!`,
+    );
+
+    summarizeHours(events);
   });
 
 async function runInvoiceHoursCounterCli(
