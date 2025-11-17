@@ -1,24 +1,24 @@
 {
   "name": "@jalexw/invoice-hours-counter",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": false,
   "repository": "https://github.com/jalexw/invoice-hours-counter.git",
   "license": "MIT",
   "scripts": {
     "cli": "bun run src/cli.ts",
     "test": "bun test",
-    "build:cjs": "bun build ./src/index.ts --outfile ./dist-cjs/index.cjs --format cjs --target node",
-    "build:esm": "bun build ./src/index.ts --outfile ./dist-esm/index.mjs --format esm --target node",
+    "build:cjs": "bun build ./src/cli.ts --outfile ./dist-cjs/index.cjs --format cjs --target node",
+    "build:esm": "bun build ./src/cli.ts --outfile ./dist-esm/index.mjs --format esm --target node",
     "build:types": "tsc --project tsconfig.json",
     "build": "bun run build:types && bun run build:cjs && bun run build:esm"
   },
   "dependencies": {
     "@jalexw/calendar-ics-parser": "0.0.5"
   },
-  "packageManager": "bun@1.2.22",
+  "packageManager": "bun@1.3.1",
   "devDependencies": {
     "typescript": "5.9.3",
-    "bun-types": "1.2.22",
+    "bun-types": "1.3.1",
     "tsc-alias": "1.8.16"
   },
   "type": "module",
