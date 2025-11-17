@@ -1,14 +1,14 @@
 {
   "name": "@jalexw/invoice-hours-counter",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": false,
   "repository": "https://github.com/jalexw/invoice-hours-counter.git",
   "license": "MIT",
   "scripts": {
     "cli": "bun run src/cli.ts",
     "test": "bun test",
-    "build:cjs": "bun build ./src/cli.ts --outfile ./dist-cjs/index.cjs --format cjs --target node",
-    "build:esm": "bun build ./src/cli.ts --outfile ./dist-esm/index.mjs --format esm --target node",
+    "build:cjs": "bun build ./src/cli.ts --outfile ./dist-cjs/cli.cjs --format cjs --target node",
+    "build:esm": "bun build ./src/cli.ts --outfile ./dist-esm/cli.mjs --format esm --target node",
     "build:types": "tsc --project tsconfig.json",
     "build": "bun run build:types && bun run build:cjs && bun run build:esm"
   },
@@ -22,9 +22,9 @@
     "tsc-alias": "1.8.16"
   },
   "type": "module",
-  "module": "dist-esm/index.mjs",
-  "main": "dist-cjs/index.cjs",
-  "types": "dist-types/index.d.ts",
+  "module": "dist-esm/cli.mjs",
+  "main": "dist-cjs/cli.cjs",
+  "types": "dist-types/cli.d.ts",
   "publishConfig": {
     "access": "public"
   }
