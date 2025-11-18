@@ -41,8 +41,8 @@ const instructions: InstructionalImage[] = [
     title: "4. Upload your .ics file and apply filters",
     description:
       "Navigate to the 'upload your calendar' / 'upload' tab from the navigation bar at the top of this webpage. Upload your .ics file, apply any desired filters, and click 'Parse Calendar Events'! A table will be generated summarizing your hours on the project.",
-    actualX: 868,
-    actualY: 348,
+    actualX: 1064,
+    actualY: 701,
     src: "/instructions/using_the_tool.png",
   },
 ];
