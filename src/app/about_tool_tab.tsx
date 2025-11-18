@@ -40,9 +40,13 @@ const instructions: InstructionalImage[] = [
   {
     title: "4. Upload your .ics file and apply filters",
     description:
-      "Navigate to the 'upload your calendar' / 'upload' tab from the navigation bar at the top of this webpage. Upload your .ics file, apply any desired filters, and click 'Parse Calendar Events'! A table will be generated summarizing your hours on the project.",
-    actualX: 1064,
-    actualY: 701,
+      "Navigate to the 'upload your calendar' / 'upload' tab from the navigation bar at the top of this webpage. " +
+      "Upload your .ics file, apply any desired filters, and click the 'Parse Calendar Events' button! " +
+      "A table will be generated summarizing your hours on the project. " +
+      "Note that in this example only 'Proj1' hours appear-- the one 'Proj2' event has been filtered out! " +
+      "You can also export this table into a comma-separated values (CSV) file, that you can open in Excel/Numbers/Google Sheets!",
+    actualX: 1023,
+    actualY: 696,
     src: "/instructions/using_the_tool.png",
   },
 ];

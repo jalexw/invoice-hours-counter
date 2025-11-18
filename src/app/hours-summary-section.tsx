@@ -59,6 +59,7 @@ export default function HoursSummarySection({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Date</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Hours</TableHead>
           </TableRow>
@@ -66,6 +67,7 @@ export default function HoursSummarySection({
         <TableBody>
           {summary.events.map((event) => (
             <TableRow key={event.id}>
+              <TableCell>{event.startTime.toDateString()}</TableCell>
               <TableCell>{event.description}</TableCell>
               <TableCell>{event.durationHours.toFixed(2)}</TableCell>
             </TableRow>
@@ -73,7 +75,9 @@ export default function HoursSummarySection({
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TableCell>Total</TableCell>
+            <TableCell colSpan={2} className="text-center">
+              Total Hours
+            </TableCell>
             <TableCell>{summary.sum.toFixed(2)}</TableCell>
           </TableRow>
         </TableFooter>
@@ -83,9 +87,12 @@ export default function HoursSummarySection({
           e.preventDefault();
           const events = summary.events;
           let csv: string = events
-            .map((event) => `${event.description},${event.durationHours}`)
+            .map(
+              (event) =>
+                `${event.startTime.toISOString()},${event.description},${event.durationHours}`,
+            )
             .join("\n");
-          csv = `Description,Hours\n${csv}`;
+          csv = `Date,Description,Hours\n${csv}`;
           const blob = new Blob([csv], { type: "text/csv" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -95,7 +102,7 @@ export default function HoursSummarySection({
         }}
         className="flex flex-row flex-nowrap gap-2"
       >
-        <TableIcon className="h-4 w-4" /> Download as CSV
+        <TableIcon className="h-4 w-4" /> Download table as CSV
       </Button>
       <div className="flex flex-col items-center justify-start gap-4">
         <p>

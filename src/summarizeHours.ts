@@ -15,6 +15,7 @@ export interface IEventWithBillableHoursSummary {
   description: string;
   durationHours: number;
   id: string;
+  startTime: Date;
 }
 
 export interface ISummaryGenerationResult {
@@ -64,8 +65,8 @@ export default function summarizeHours({
       throw new TypeError(`Missing dtstart or dtend for event '${event.uid}'`);
     }
 
-    const start = parseDate(event.dtstart);
-    const end = parseDate(event.dtend);
+    const start: Date = parseDate(event.dtstart);
+    const end: Date = parseDate(event.dtend);
     const durationMs: number = end.getTime() - start.getTime();
     const durationSeconds: number = durationMs / 1000;
     const durationMinutes: number = durationSeconds / 60;
@@ -90,6 +91,7 @@ export default function summarizeHours({
       description,
       durationHours,
       id: event.uid,
+      startTime: start,
     });
   }
 

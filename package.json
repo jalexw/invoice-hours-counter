@@ -1,6 +1,6 @@
 {
   "name": "@jalexw/invoice-hours-counter",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": false,
   "repository": "https://github.com/jalexw/invoice-hours-counter.git",
   "license": "MIT",
@@ -12,7 +12,8 @@
     "build:types": "tsc --project tsconfig.json",
     "build": "bun run build:types && bun run build:cjs && bun run build:esm",
     "web:dev": "next dev --port 3461",
-    "web:build": "next build"
+    "web:build": "next build",
+    "dev": "bun run web:dev"
   },
   "dependencies": {
     "@jalexw/calendar-ics-parser": "0.0.9",
