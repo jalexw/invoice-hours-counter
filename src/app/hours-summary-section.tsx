@@ -8,6 +8,7 @@ import { type ReactElement, useMemo } from "react";
 import useFilterInputsStore from "./useFilterInputsStore";
 import type { IFilterOptions } from "@/filterEvents";
 import {
+  Button,
   cn,
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import {
   TableRow,
 } from "@schemavaults/ui";
 import Image from "next/image";
+import { Table as TableIcon } from "lucide-react";
 
 export interface ISummaryProps {
   icsData: ParsedIcsData;
@@ -73,14 +75,33 @@ export default function HoursSummarySection({
           </TableRow>
         </TableFooter>
       </Table>
+      <Button
+        onClick={(e): void => {
+          e.preventDefault();
+          const events = summary.events;
+          let csv: string = events
+            .map((event) => `${event.description},${event.durationHours}`)
+            .join("\n");
+          csv = `Description,Hours\n${csv}`;
+          const blob = new Blob([csv], { type: "text/csv" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "invoice_hours.csv";
+          a.click();
+        }}
+        className="flex flex-row flex-nowrap gap-2"
+      >
+        <TableIcon className="h-4 w-4" /> Download as CSV
+      </Button>
       <div className="flex flex-col items-center justify-start gap-4">
         <p>
-          Did this save you some time? Feel free to buy me a coffee at the
+          Did this tool save you some time? Feel free to buy me a coffee at the
           following link:
         </p>
         <a href="https://buymeacoffee.com/jalexw">
           <Image
-            src="./public/buymeacoffee.gif"
+            src="/buymeacoffee.gif"
             alt="Buy me a coffee"
             width={300}
             height={300}
