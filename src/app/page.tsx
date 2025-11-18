@@ -3,13 +3,10 @@
 import { useState, type ReactElement } from "react";
 import { cn, Tabs, TabsList, TabsContent, TabsTrigger } from "@schemavaults/ui";
 import type { ParsedIcsData } from "@jalexw/calendar-ics-parser";
-import summarizeHours from "@/summarizeHours";
 import IcsAndFiltersInputsForm from "./ics-and-filters-input-form";
 import AboutToolTab from "./about_tool_tab";
 import HoursSummarySection from "./hours-summary-section";
-
-const github_url =
-  "https://github.com/jalexw/invoice-hours-counter" as const satisfies string;
+import github_url from "./github_url";
 
 export default function Page(): ReactElement {
   const [parsedIcs, setParsedIcs] = useState<ParsedIcsData | undefined>(
