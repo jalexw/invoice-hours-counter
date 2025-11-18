@@ -1,4 +1,4 @@
-import { IcsEvent } from "@jalexw/calendar-ics-parser";
+import type { IcsEvent } from "@jalexw/calendar-ics-parser";
 import parseDate from "./parseDate";
 
 function compare(event1: IcsEvent, event2: IcsEvent): number {
@@ -12,6 +12,8 @@ function compare(event1: IcsEvent, event2: IcsEvent): number {
   return t1.getTime() - t2.getTime();
 }
 
-export default function sortEvents(events: IcsEvent[]): IcsEvent[] {
+export default function sortEvents(
+  events: readonly IcsEvent[],
+): readonly IcsEvent[] {
   return events.toSorted(compare);
 }

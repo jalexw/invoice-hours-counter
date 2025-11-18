@@ -2,8 +2,8 @@ import type { IcsEvent } from "@jalexw/calendar-ics-parser";
 import parseDate from "./parseDate";
 
 export interface IFilterOptions {
-  project: string;
-  after?: Date;
+  project?: string | null;
+  after?: Date | null;
 }
 
 function hasProjectPrefix(title: string, project: string): boolean {
@@ -55,14 +55,17 @@ export default function filterEvents(
     return false;
   }
 
-  const title: string = event.summary.trim();
-  if (!hasProjectPrefix(title, options.project)) {
-    return false;
+  // If a 'project' filter was supplied
+  if (typeof options.project === "string" && options.project.length > 0) {
+    const title: string = event.summary.trim();
+    if (!hasProjectPrefix(title, options.project)) {
+      return false;
+    }
   }
 
   if (options.after) {
     if (!event.dtstart) {
-      console.warn(`No dtstart set for '${title}'`);
+      console.warn(`No dtstart set for event '${event.summary}'`);
       return false;
     }
     const startTime = parseDate(event.dtstart);

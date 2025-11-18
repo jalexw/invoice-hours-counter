@@ -1,6 +1,6 @@
 {
   "name": "@jalexw/invoice-hours-counter",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "private": false,
   "repository": "https://github.com/jalexw/invoice-hours-counter.git",
   "license": "MIT",
@@ -10,16 +10,25 @@
     "build:cjs": "bun build ./src/cli.ts --outfile ./dist-cjs/cli.cjs --format cjs --target node",
     "build:esm": "bun build ./src/cli.ts --outfile ./dist-esm/cli.mjs --format esm --target node",
     "build:types": "tsc --project tsconfig.json",
-    "build": "bun run build:types && bun run build:cjs && bun run build:esm"
+    "build": "bun run build:types && bun run build:cjs && bun run build:esm",
+    "dev": "next dev --port 3461"
   },
   "dependencies": {
-    "@jalexw/calendar-ics-parser": "0.0.5"
+    "@jalexw/calendar-ics-parser": "0.0.9",
+    "next": "16.0.3",
+    "@schemavaults/ui": "0.11.131",
+    "lucide-react": "0.554.0",
+    "zustand": "5.0.8"
   },
   "packageManager": "bun@1.3.1",
   "devDependencies": {
     "typescript": "5.9.3",
     "bun-types": "1.3.1",
-    "tsc-alias": "1.8.16"
+    "tsc-alias": "1.8.16",
+    "tailwindcss": "3.4.17",
+    "@schemavaults/theme": "0.22.18",
+    "postcss": "8.5.6",
+    "autoprefixer": "10.4.17"
   },
   "type": "module",
   "module": "dist-esm/cli.mjs",

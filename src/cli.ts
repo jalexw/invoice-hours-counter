@@ -2,11 +2,10 @@ import { Command } from "commander";
 import {
   readUtf8,
   parseIcsData,
-  ParsedIcsData,
+  type ParsedIcsData,
 } from "@jalexw/calendar-ics-parser";
-import filterEvents, { IFilterOptions } from "./filterEvents";
+import filterEvents, { type IFilterOptions } from "./filterEvents";
 import summarizeHours from "./summarizeHours";
-import sortEvents from "./sortEvents";
 
 const cli = new Command();
 
@@ -63,8 +62,7 @@ cli
         : undefined;
 
     if (typeof project !== "string") {
-      console.error("Failed to parse project from --project flag!");
-      process.exit(1);
+      console.warn("No project was parsed from --project flag!");
     } else {
       console.log("Project: ", project);
     }
@@ -87,34 +85,22 @@ cli
 
     if (
       !Array.isArray(parsed.calendars) ||
-      parsed.calendars.length !== 1 ||
+      parsed.calendars.length < 1 ||
       !parsed.calendars[0]
     ) {
-      console.error(
-        "Expected a single calendar to have been parsed from .ics file!",
-      );
+      console.error("Failed to parse at least one calendar from .ics file!");
       process.exit(1);
     }
 
-    const calendar = parsed.calendars[0];
-    let events = [...calendar.events];
-
-    const N_UNFILTERED_EVENTS: number = events.length;
-    console.log(`Found ${N_UNFILTERED_EVENTS} raw events in calendar!`);
-
-    const filters: IFilterOptions = {
-      project,
-      after,
-    };
-
-    events = events.filter((e): boolean => filterEvents(e, filters));
-    const N_FILTERED_EVENTS: number = events.length;
-    const N_EVENTS_DROPPED: number = N_UNFILTERED_EVENTS - N_FILTERED_EVENTS;
-    console.log(
-      `Dropped ${N_EVENTS_DROPPED} events based on filters, leaving ${N_FILTERED_EVENTS} events!`,
-    );
-
-    summarizeHours(sortEvents(events), project);
+    const output = summarizeHours({
+      data: parsed,
+      log: console.log,
+      filters: {
+        project,
+        after,
+      },
+    });
+    void output; // output object is not used-- console.log is sufficient for CLI
   });
 
 async function runInvoiceHoursCounterCli(

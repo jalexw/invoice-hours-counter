@@ -1,12 +1,63 @@
-import { IcsEvent } from "@jalexw/calendar-ics-parser";
+import type { IcsEvent, ParsedIcsData } from "@jalexw/calendar-ics-parser";
 import parseDate from "./parseDate";
+import type { IFilterOptions } from "./filterEvents";
+import sortEvents from "./sortEvents";
+import filterEvents from "./filterEvents";
 
-export default function summarizeHours(
+export interface ISummarizeHoursInputOptions {
+  data: ParsedIcsData;
+  filters?: IFilterOptions;
+  // Custom log function (e.g. console.log), this will print summary data, if supplied
+  log?: (...vals: unknown[]) => void;
+}
+
+export interface IEventWithBillableHoursSummary {
+  description: string;
+  durationHours: number;
+  id: string;
+}
+
+export interface ISummaryGenerationResult {
+  sum: number;
+  events: readonly IEventWithBillableHoursSummary[];
+}
+
+function parseAllEvents(data: ParsedIcsData): readonly IcsEvent[] {
+  return data.calendars.flatMap((cal) => cal.events);
+}
+
+function applyFilters(
   events: readonly IcsEvent[],
-  project: string,
-  log: (...vals: unknown[]) => void = console.log,
-): void {
+  filters: IFilterOptions,
+  log: (...vals: unknown[]) => void,
+): readonly IcsEvent[] {
+  const N_UNFILTERED_EVENTS: number = events.length;
+  log(`Found ${N_UNFILTERED_EVENTS} raw events from calendar(s)!`);
+  const filtered = events.filter((e) => filterEvents(e, filters));
+  const N_FILTERED_EVENTS: number = filtered.length;
+  const N_EVENTS_DROPPED: number = N_UNFILTERED_EVENTS - N_FILTERED_EVENTS;
+  log(
+    `Dropped ${N_EVENTS_DROPPED} events based on filters, leaving ${N_FILTERED_EVENTS} events!`,
+  );
+  return filtered;
+}
+
+export default function summarizeHours({
+  data,
+  filters,
+  log = console.log,
+}: ISummarizeHoursInputOptions): ISummaryGenerationResult {
+  let events: readonly IcsEvent[] = parseAllEvents(data);
+  if (typeof filters === "object" && !!filters) {
+    events = applyFilters(events, filters, log);
+  }
+  events = sortEvents(events);
+
+  const project: string | undefined | null = filters?.project;
+
   let sum: number = 0;
+
+  const summarized_events: IEventWithBillableHoursSummary[] = [];
 
   for (const event of events) {
     if (!event.dtstart || !event.dtend) {
@@ -16,17 +67,36 @@ export default function summarizeHours(
     const start = parseDate(event.dtstart);
     const end = parseDate(event.dtend);
     const durationMs: number = end.getTime() - start.getTime();
-    const durationS = durationMs / 1000;
-    const durationHrs = durationS / 60 / 60;
+    const durationSeconds: number = durationMs / 1000;
+    const durationMinutes: number = durationSeconds / 60;
+    const durationHours: number = durationMinutes / 60;
 
-    let summary: string = event.summary ?? "";
-    if (summary.startsWith(`${project} - `)) {
-      summary = summary.substring(`${project} - `.length);
+    let description: string = event.summary ?? "";
+    if (typeof project === "string" && project.length > 0) {
+      if (description.startsWith(`${project} - `)) {
+        description = description.substring(`${project} - `.length);
+      } else if (description.startsWith(`${project} | `)) {
+        description = description.substring(`${project} | `.length);
+      } else if (description.startsWith(`Work on ${project} - `)) {
+        description = description.substring(`Work on ${project} - `.length);
+      }
     }
 
-    log(`${start.toDateString()} | ${durationHrs.toFixed(2)} | ${summary}`);
-    sum += durationHrs;
+    log(
+      `${start.toDateString()} | ${durationHours.toFixed(2)} | ${description}`,
+    );
+    sum += durationHours;
+    summarized_events.push({
+      description,
+      durationHours,
+      id: event.uid,
+    });
   }
 
-  console.log(`\nTotal Hours: ${sum.toFixed(2)}`);
+  log(`\nTotal Hours: ${sum.toFixed(2)}`);
+
+  return {
+    sum,
+    events: [...summarized_events],
+  };
 }
