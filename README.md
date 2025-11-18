@@ -25,9 +25,7 @@ bun install
 bun run cli count-hours ./inputs/FreelanceWork.ics --project Project1 --after 2025-03-09T00:00:00Z
 ```
 
-## Development / Contributions
-
-Contributions are welcomed! Feel free to make a pull request :)
+## Development / Adding Features
 
 ### Starting a development web server
 
@@ -42,3 +40,11 @@ bun run web:dev
 # install dependencies first `bun install`
 bun run web:build
 ```
+
+## Contributions
+
+Contributions are welcomed! Feel free to make a pull request! 🤗
+
+Not tech savvy but appreciate the work? Feel free to buy me a coffee at the following link:
+
+[![GIF as a link to buy jalexw a coffee](./public/buymeacoffee.gif)](https://buymeacoffee.com/jalexw)
