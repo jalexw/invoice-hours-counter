@@ -2,6 +2,8 @@
 
 ## Welcome 👋
 
+![Icon for the @jalexw/invoice-hours-counter project](./public/icon.png)
+
 This is the repository for the `@jalexw/invoice-hours-counter` tool. Export an iCalendar calendar and extract how many hours you've recorded!
 
 I built this to allow me to easily track my freelance hours directly in iCalendar-- then I can just export the calendar events, filter the corresponding events, and automatically count my hours up to prepare an itemized invoice!
