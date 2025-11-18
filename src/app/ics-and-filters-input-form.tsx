@@ -102,13 +102,24 @@ function IcsAndFiltersInputsForm({
             e.preventDefault();
             const maybeDate: Date | null = e.target.valueAsDate;
 
-            if (!maybeDate) {
-              setAfterDate(null);
+            if (!(maybeDate instanceof Date)) {
+              // Might just not be supported-- try parsing from value
+              const dateStr = e.target.value;
+              const parsedDate = new Date(dateStr);
+              if (isNaN(parsedDate.getTime())) {
+                setAfterDate(null);
+                return;
+              }
+              setAfterDate(parsedDate);
+              return;
+            } else {
+              if (process.env.NODE_ENV === "development") {
+                console.log("New After Date: ", maybeDate);
+              }
+              setAfterDate(maybeDate);
               return;
             }
-            setAfterDate(maybeDate);
-            return;
-          }}
+          }} // end of onChange handler
           disabled={parsing}
         />
       </div>

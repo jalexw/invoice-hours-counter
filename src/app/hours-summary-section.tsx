@@ -36,6 +36,9 @@ export default function HoursSummarySection({
     };
   }, [after, project]);
   const summary: ISummaryGenerationResult = useMemo(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("Generating summary with filters:", filters);
+    }
     return summarizeHours({
       data: icsData,
       log:
@@ -64,14 +67,14 @@ export default function HoursSummarySection({
           {summary.events.map((event) => (
             <TableRow key={event.id}>
               <TableCell>{event.description}</TableCell>
-              <TableCell>{event.durationHours}</TableCell>
+              <TableCell>{event.durationHours.toFixed(2)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
         <TableFooter>
           <TableRow>
             <TableCell>Total</TableCell>
-            <TableCell>{summary.sum}</TableCell>
+            <TableCell>{summary.sum.toFixed(2)}</TableCell>
           </TableRow>
         </TableFooter>
       </Table>
