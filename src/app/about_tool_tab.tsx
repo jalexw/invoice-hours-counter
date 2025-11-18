@@ -57,9 +57,15 @@ export default function AboutToolTab(): ReactElement {
     <TabsContent value="about" className="flex flex-col gap-4">
       <h2 className="text-xl font-semibold">About this tool:</h2>
       <p>
-        This is a free <a href={github_url}>open-source tool</a> to help you
-        calculate the number of hours you worked on a project from an iCalendar
-        file export.
+        This is a free{" "}
+        <a
+          href={github_url}
+          className={cn("text-blue-500 underline hover:cursor-pointer")}
+        >
+          open-source
+        </a>{" "}
+        tool to help you calculate the number of hours you worked on a project
+        from an iCalendar .ics file export.
       </p>
       <p>
         Click 'upload your calendar' in the navigation bar to upload your
