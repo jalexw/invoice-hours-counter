@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@schemavaults/ui";
+import Image from "next/image";
 
 export interface ISummaryProps {
   icsData: ParsedIcsData;
@@ -72,6 +73,20 @@ export default function HoursSummarySection({
           </TableRow>
         </TableFooter>
       </Table>
+      <div className="flex flex-col items-center justify-start gap-4">
+        <p>
+          Did this save you some time? Feel free to buy me a coffee at the
+          following link:
+        </p>
+        <a href="https://buymeacoffee.com/jalexw">
+          <Image
+            src="./public/buymeacoffee.gif"
+            alt="Buy me a coffee"
+            width={300}
+            height={300}
+          />
+        </a>
+      </div>
     </div>
   );
 }
