@@ -12,7 +12,7 @@
   },
   "forwardPorts": [3461],
   "portsAttributes": {
-    "6006": {
+    "3461": {
       "label": "Development Server",
       "onAutoForward": "openPreview"
     }
