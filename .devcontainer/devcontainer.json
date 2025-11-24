@@ -1,0 +1,28 @@
+{
+  "name": "@jalexw/invoice-hours-counter Bun Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "BUN_VERSION": "1.3.1"
+    }
+  },
+  "postCreateCommand": "bun install",
+  "postAttachCommand": {
+    "server": "bun run web:dev"
+  },
+  "forwardPorts": [3461],
+  "portsAttributes": {
+    "6006": {
+      "label": "Development Server",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    },
+    "vscode": {
+      "extensions": []
+    }
+  }
+}
