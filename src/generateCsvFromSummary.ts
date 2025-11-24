@@ -9,6 +9,6 @@ export default function generateCsvFromSummary(
         `${event.startTime.toISOString()},"${event.description}",${event.durationHours}`,
     )
     .join("\n");
-  csv = `Date,Description,Hours\n${csv}`;
+  csv = `"Date","Description","Hours"\n${csv}`;
   return csv;
 }
