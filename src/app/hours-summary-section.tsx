@@ -20,6 +20,7 @@ import {
 } from "@schemavaults/ui";
 import Image from "next/image";
 import { Table as TableIcon } from "lucide-react";
+import generateCsvFromSummary from "@/generateCsvFromSummary";
 
 export interface ISummaryProps {
   icsData: ParsedIcsData;
@@ -85,14 +86,7 @@ export default function HoursSummarySection({
       <Button
         onClick={(e): void => {
           e.preventDefault();
-          const events = summary.events;
-          let csv: string = events
-            .map(
-              (event) =>
-                `${event.startTime.toISOString()},${event.description},${event.durationHours}`,
-            )
-            .join("\n");
-          csv = `Date,Description,Hours\n${csv}`;
+          const csv: string = generateCsvFromSummary(summary);
           const blob = new Blob([csv], { type: "text/csv" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -113,8 +107,9 @@ export default function HoursSummarySection({
           <Image
             src="/buymeacoffee.gif"
             alt="Buy me a coffee"
-            width={300}
-            height={300}
+            width={500}
+            height={500}
+            unoptimized
           />
         </a>
       </div>
