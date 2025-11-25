@@ -22,7 +22,7 @@ git clone https://github.com/jalexw/invoice-hours-counter.git && cd invoice-hour
 # install dependencies with the 'bun' package manager (https://bun.sh)
 bun install
 # run the cli, passing the path to your exported .ics file and any filters!
-bun run cli count-hours ./inputs/FreelanceWork.ics --project Project1 --after 2025-03-09T00:00:00Z
+bun run cli count-hours ./PathToMyFreelanceWorkCalendar.ics --project Project1 --after 2025-03-09T00:00:00Z --before 2025-03-16T00:00:00Z --csv ./my-invoice-hours-output-file-path.csv
 ```
 
 ## Development / Adding Features

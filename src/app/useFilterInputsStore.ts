@@ -7,6 +7,8 @@ export interface IInvoiceHoursCounterFilterInputsState {
   setProject: (project: string) => void;
   after: Date | null;
   setAfterDate: (date: Date | null) => void;
+  before: Date | null;
+  setBeforeDate: (date: Date | null) => void;
 }
 
 const useFilterInputsStore = create<IInvoiceHoursCounterFilterInputsState>(
@@ -15,6 +17,8 @@ const useFilterInputsStore = create<IInvoiceHoursCounterFilterInputsState>(
     setProject: (project: string) => set({ project }),
     after: null,
     setAfterDate: (after: Date | null) => set({ after }),
+    before: null,
+    setBeforeDate: (before: Date | null) => set({ before }),
   }),
 );
 

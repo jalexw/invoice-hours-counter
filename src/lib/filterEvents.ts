@@ -4,6 +4,7 @@ import parseDate from "./parseDate";
 export interface IFilterOptions {
   project?: string | null;
   after?: Date | null;
+  before?: Date | null;
 }
 
 function hasProjectPrefix(title: string, project: string): boolean {
@@ -71,6 +72,18 @@ export default function filterEvents(
     const startTime = parseDate(event.dtstart);
 
     if (startTime.getTime() < options.after.getTime()) {
+      return false;
+    }
+  }
+
+  if (options.before) {
+    if (!event.dtend) {
+      console.warn(`No dtend set for event '${event.summary}'`);
+      return false;
+    }
+    const endTime = parseDate(event.dtend);
+
+    if (endTime.getTime() > options.before.getTime()) {
       return false;
     }
   }

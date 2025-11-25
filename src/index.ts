@@ -2,7 +2,6 @@
  * @jalexw/invoice-hours-counter
  */
 
-export {
-  runInvoiceHoursCounterCli,
-  runInvoiceHoursCounterCli as default,
-} from "./cli";
+export * from "./cli";
+export type * from "./cli";
+export { default as default } from "./cli";

@@ -19,3 +19,9 @@ dist-types/
 .env.production
 
 .next
+
+tsconfig.tsbuildinfo
+
+test-outputs/
+
+tmp/

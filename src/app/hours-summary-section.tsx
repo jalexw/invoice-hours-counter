@@ -2,11 +2,11 @@
 
 import summarizeHours, {
   type ISummaryGenerationResult,
-} from "@/summarizeHours";
+} from "@/lib/summarizeHours";
 import type { ParsedIcsData } from "@jalexw/calendar-ics-parser";
 import { type ReactElement, useMemo } from "react";
 import useFilterInputsStore from "./useFilterInputsStore";
-import type { IFilterOptions } from "@/filterEvents";
+import type { IFilterOptions } from "@/lib/filterEvents";
 import {
   Button,
   cn,
@@ -20,7 +20,7 @@ import {
 } from "@schemavaults/ui";
 import Image from "next/image";
 import { Table as TableIcon } from "lucide-react";
-import generateCsvFromSummary from "@/generateCsvFromSummary";
+import generateCsvFromSummary from "@/lib/generateCsvFromSummary";
 
 export interface ISummaryProps {
   icsData: ParsedIcsData;
@@ -29,11 +29,12 @@ export interface ISummaryProps {
 export default function HoursSummarySection({
   icsData,
 }: ISummaryProps): ReactElement {
-  const { after, project } = useFilterInputsStore();
+  const { after, project, before } = useFilterInputsStore();
   const filters: IFilterOptions = useMemo(() => {
     return {
       after,
       project,
+      before,
     };
   }, [after, project]);
   const summary: ISummaryGenerationResult = useMemo(() => {

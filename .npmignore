@@ -2,6 +2,7 @@ node_modules/
 
 src/
 tsconfig.json
+tsconfig.tsbuildinfo
 
 inputs/
 outputs/
@@ -10,6 +11,8 @@ samples/
 **/*.test.js
 **/*.test.js.map
 **/*.test.d.ts
+test-fixtures/
+test-outputs/
 
 .env
 .env.local
@@ -22,3 +25,5 @@ samples/
 
 .github/
 .env.example
+
+tmp/

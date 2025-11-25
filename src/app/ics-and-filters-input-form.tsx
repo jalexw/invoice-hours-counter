@@ -1,6 +1,6 @@
 "use client";
 
-import { ParsedIcsData } from "@jalexw/calendar-ics-parser";
+import type { ParsedIcsData } from "@jalexw/calendar-ics-parser";
 import {
   Button,
   cn,
@@ -21,7 +21,8 @@ function IcsAndFiltersInputsForm({
   setParsedIcs,
 }: IcsAndFiltersInputsFormProps): ReactElement {
   const debug: boolean = process.env.NODE_ENV === "development";
-  const { project, setProject, after, setAfterDate } = useFilterInputsStore();
+  const { project, setProject, setBeforeDate, setAfterDate } =
+    useFilterInputsStore();
   const [icsFile, setIcsFile] = useState<string | undefined>(undefined);
   const [parsing, startParsing] = useTransition();
   const { toast } = useToast();
@@ -117,6 +118,37 @@ function IcsAndFiltersInputsForm({
                 console.log("New After Date: ", maybeDate);
               }
               setAfterDate(maybeDate);
+              return;
+            }
+          }} // end of onChange handler
+          disabled={parsing}
+        />
+      </div>
+      <div className={inputContainerClassname}>
+        <Label htmlFor="before">Filter Before</Label>
+        <Input
+          id="before"
+          name="before"
+          type="datetime-local"
+          onChange={(e): void => {
+            e.preventDefault();
+            const maybeDate: Date | null = e.target.valueAsDate;
+
+            if (!(maybeDate instanceof Date)) {
+              // Might just not be supported-- try parsing from value
+              const dateStr = e.target.value;
+              const parsedDate = new Date(dateStr);
+              if (isNaN(parsedDate.getTime())) {
+                setBeforeDate(null);
+                return;
+              }
+              setBeforeDate(parsedDate);
+              return;
+            } else {
+              if (process.env.NODE_ENV === "development") {
+                console.log("New Before Date: ", maybeDate);
+              }
+              setBeforeDate(maybeDate);
               return;
             }
           }} // end of onChange handler
