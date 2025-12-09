@@ -25,3 +25,5 @@ tsconfig.tsbuildinfo
 test-outputs/
 
 tmp/
+
+next-env.d.ts
