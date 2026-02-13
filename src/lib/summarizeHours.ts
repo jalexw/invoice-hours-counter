@@ -43,6 +43,33 @@ function applyFilters(
   return filtered;
 }
 
+function calculateBillableHours(
+  event: IcsEvent,
+  log: (...vals: unknown[]) => void,
+): number {
+  if (typeof event.dtstart !== "string" && typeof event.dtstart !== "number") {
+    log(
+      `Invalid dtstart for event '${event.uid}'-- likely a full-day event in calendar. Treating as 0 billable hours!`,
+    );
+    return 0;
+  } else if (
+    typeof event.dtend !== "string" &&
+    typeof event.dtend !== "number"
+  ) {
+    log(
+      `Invalid dtend for event '${event.uid}'-- likely a full-day event in calendar. Treating as 0 billable hours!`,
+    );
+    return 0;
+  }
+  const start: Date = parseDate(event.dtstart);
+  const end: Date = parseDate(event.dtend);
+  const durationMs: number = end.getTime() - start.getTime();
+  const durationSeconds: number = durationMs / 1000;
+  const durationMinutes: number = durationSeconds / 60;
+  const durationHours: number = durationMinutes / 60;
+  return durationHours;
+}
+
 export default function summarizeHours({
   data,
   filters,
@@ -65,33 +92,8 @@ export default function summarizeHours({
       throw new TypeError(`Missing dtstart or dtend for event '${event.uid}'`);
     }
 
-    function calculateBillableHours(event: IcsEvent): number {
-      if (typeof event.dtstart !== "number" || isNaN(event.dtstart)) {
-        log(
-          `Invalid dtstart for event '${event.uid}'-- likely a full-day event in calendar. Treating as 0 billable hours!`,
-        );
-        return 0;
-      } else if (typeof event.dtend !== "number" || isNaN(event.dtend)) {
-        log(
-          `Invalid dtend for event '${event.uid}'-- likely a full-day event in calendar. Treating as 0 billable hours!`,
-        );
-        return 0;
-      }
-      const start: Date = parseDate(event.dtstart);
-      const end: Date = parseDate(event.dtend);
-      const durationMs: number = end.getTime() - start.getTime();
-      const durationSeconds: number = durationMs / 1000;
-      const durationMinutes: number = durationSeconds / 60;
-      const durationHours: number = durationMinutes / 60;
-      return durationHours;
-    }
-
-    const eventStartDefined: boolean =
-      typeof event.dtstart === "number" && !isNaN(event.dtstart);
-    const startDateString = eventStartDefined
-      ? parseDate(event.dtstart).toDateString()
-      : "N/A";
-    const billableHours: number = calculateBillableHours(event);
+    const startDateString = parseDate(event.dtstart).toDateString();
+    const billableHours: number = calculateBillableHours(event, log);
 
     let description: string = event.summary ?? "";
     if (typeof project === "string" && project.length > 0) {
@@ -104,16 +106,20 @@ export default function summarizeHours({
       }
     }
 
-    log(`${startDateString} | ${billableHours.toFixed(2)} | ${description}`);
-    sum += billableHours;
-    if (eventStartDefined) {
-      summarized_events.push({
-        description,
-        durationHours: billableHours,
-        id: event.uid,
-        startTime: parseDate(event.dtstart),
-      });
+    if (isNaN(billableHours)) {
+      log(
+        `⚠️ Billing error for event '${event.uid}' (${description}) is not a number!`,
+      );
+    } else {
+      log(`${startDateString} | ${billableHours.toFixed(2)} | ${description}`);
+      sum += billableHours;
     }
+    summarized_events.push({
+      description,
+      durationHours: billableHours,
+      id: event.uid,
+      startTime: parseDate(event.dtstart),
+    });
   } // end of events loop
 
   log(`\nTotal Hours: ${sum.toFixed(2)}`);
