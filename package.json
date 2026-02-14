@@ -1,12 +1,12 @@
 {
   "name": "@jalexw/invoice-hours-counter",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "private": false,
   "repository": "https://github.com/jalexw/invoice-hours-counter.git",
   "license": "MIT",
   "scripts": {
     "cli": "bun run src/cli/index.ts",
-    "test": "bun test",
+    "test": "bun test && rm -rf ./test-outputs",
     "build:cjs": "bun build ./src/cli/index.ts --outfile ./dist-cjs/cli.cjs --format cjs --target node",
     "build:esm": "bun build ./src/cli/index.ts --outfile ./dist-esm/cli.mjs --format esm --target node",
     "build:types": "tsc --project tsconfig.json",
