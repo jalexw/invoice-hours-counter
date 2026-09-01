@@ -1,5 +1,7 @@
 # Invoice Hours Counter
 
+[![CI](https://github.com/jalexw/invoice-hours-counter/actions/workflows/ci.yml/badge.svg)](https://github.com/jalexw/invoice-hours-counter/actions/workflows/ci.yml)
+
 ## Welcome 👋
 
 ![Icon for the @jalexw/invoice-hours-counter project](./public/icon.png)
@@ -40,6 +42,16 @@ bun run web:dev
 # install dependencies first `bun install`
 bun run web:build
 ```
+
+### Running the tests and checks
+
+```bash
+bun test              # unit + CLI integration tests (fixtures live in test-fixtures/)
+bun run typecheck     # TypeScript type checking
+bun run build         # build the library (types, CJS, ESM)
+```
+
+The same checks run in GitHub Actions (`.github/workflows/ci.yml`) on every pull request and push to `main`.
 
 ## Contributions
 

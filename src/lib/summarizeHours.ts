@@ -1,14 +1,16 @@
 import type { IcsEvent, ParsedIcsData } from "@jalexw/calendar-ics-parser";
-import parseDate from "./parseDate";
+import parseDate, { isIcsDateOnly, isValidDate } from "./parseDate";
 import type { IFilterOptions } from "./filterEvents";
 import sortEvents from "./sortEvents";
 import filterEvents from "./filterEvents";
+
+export type SummaryLogFunction = (...vals: unknown[]) => void;
 
 export interface ISummarizeHoursInputOptions {
   data: ParsedIcsData;
   filters?: IFilterOptions;
   // Custom log function (e.g. console.log), this will print summary data, if supplied
-  log?: (...vals: unknown[]) => void;
+  log?: SummaryLogFunction;
 }
 
 export interface IEventWithBillableHoursSummary {
@@ -23,6 +25,8 @@ export interface ISummaryGenerationResult {
   events: readonly IEventWithBillableHoursSummary[];
 }
 
+const MILLISECONDS_PER_HOUR: number = 60 * 60 * 1000;
+
 function parseAllEvents(data: ParsedIcsData): readonly IcsEvent[] {
   return data.calendars.flatMap((cal) => cal.events);
 }
@@ -30,7 +34,7 @@ function parseAllEvents(data: ParsedIcsData): readonly IcsEvent[] {
 function applyFilters(
   events: readonly IcsEvent[],
   filters: IFilterOptions,
-  log: (...vals: unknown[]) => void,
+  log: SummaryLogFunction,
 ): readonly IcsEvent[] {
   const N_UNFILTERED_EVENTS: number = events.length;
   log(`Found ${N_UNFILTERED_EVENTS} raw events from calendar(s)!`);
@@ -43,31 +47,72 @@ function applyFilters(
   return filtered;
 }
 
+/**
+ * Calculate the billable hours for an event. Always returns a finite,
+ * non-negative number; events that cannot be billed (all-day events, missing
+ * or unparseable timestamps, negative durations) are treated as 0 hours and a
+ * message is logged explaining why.
+ */
 function calculateBillableHours(
   event: IcsEvent,
-  log: (...vals: unknown[]) => void,
+  log: SummaryLogFunction,
 ): number {
-  if (typeof event.dtstart !== "string" && typeof event.dtstart !== "number") {
+  const { dtstart, dtend } = event;
+
+  if (typeof dtstart !== "string") {
     log(
       `Invalid dtstart for event '${event.uid}'-- likely a full-day event in calendar. Treating as 0 billable hours!`,
     );
     return 0;
-  } else if (
-    typeof event.dtend !== "string" &&
-    typeof event.dtend !== "number"
-  ) {
+  }
+  if (typeof dtend !== "string") {
     log(
       `Invalid dtend for event '${event.uid}'-- likely a full-day event in calendar. Treating as 0 billable hours!`,
     );
     return 0;
   }
-  const start: Date = parseDate(event.dtstart);
-  const end: Date = parseDate(event.dtend);
-  const durationMs: number = end.getTime() - start.getTime();
-  const durationSeconds: number = durationMs / 1000;
-  const durationMinutes: number = durationSeconds / 60;
-  const durationHours: number = durationMinutes / 60;
+
+  if (isIcsDateOnly(dtstart) || isIcsDateOnly(dtend)) {
+    log(
+      `Event '${event.uid}' is an all-day event (date-only timestamps). Treating as 0 billable hours!`,
+    );
+    return 0;
+  }
+
+  const start: Date = parseDate(dtstart);
+  const end: Date = parseDate(dtend);
+  if (!isValidDate(start) || !isValidDate(end)) {
+    log(
+      `⚠️ Could not parse timestamps for event '${event.uid}' (dtstart='${dtstart}', dtend='${dtend}'). Treating as 0 billable hours!`,
+    );
+    return 0;
+  }
+
+  const durationHours: number =
+    (end.getTime() - start.getTime()) / MILLISECONDS_PER_HOUR;
+
+  if (durationHours < 0) {
+    log(
+      `⚠️ Event '${event.uid}' ends before it starts (dtstart='${dtstart}', dtend='${dtend}'). Treating as 0 billable hours!`,
+    );
+    return 0;
+  }
+
   return durationHours;
+}
+
+function stripProjectPrefix(summary: string, project: string): string {
+  const prefixes: readonly string[] = [
+    `${project} - `,
+    `${project} | `,
+    `Work on ${project} - `,
+  ];
+  for (const prefix of prefixes) {
+    if (summary.startsWith(prefix)) {
+      return summary.substring(prefix.length);
+    }
+  }
+  return summary;
 }
 
 export default function summarizeHours({
@@ -88,37 +133,38 @@ export default function summarizeHours({
   const summarized_events: IEventWithBillableHoursSummary[] = [];
 
   for (const event of events) {
-    if (!event.dtstart || !event.dtend) {
-      throw new TypeError(`Missing dtstart or dtend for event '${event.uid}'`);
+    if (typeof event.dtstart !== "string") {
+      log(
+        `⚠️ Skipping event '${event.uid}' (${event.summary ?? ""}) because it has no start time!`,
+      );
+      continue;
     }
 
-    const startDateString = parseDate(event.dtstart).toDateString();
+    const startTime: Date = parseDate(event.dtstart);
+    if (!isValidDate(startTime)) {
+      log(
+        `⚠️ Skipping event '${event.uid}' (${event.summary ?? ""}) because its start time '${event.dtstart}' could not be parsed!`,
+      );
+      continue;
+    }
+
     const billableHours: number = calculateBillableHours(event, log);
 
     let description: string = event.summary ?? "";
     if (typeof project === "string" && project.length > 0) {
-      if (description.startsWith(`${project} - `)) {
-        description = description.substring(`${project} - `.length);
-      } else if (description.startsWith(`${project} | `)) {
-        description = description.substring(`${project} | `.length);
-      } else if (description.startsWith(`Work on ${project} - `)) {
-        description = description.substring(`Work on ${project} - `.length);
-      }
+      description = stripProjectPrefix(description, project);
     }
 
-    if (isNaN(billableHours)) {
-      log(
-        `⚠️ Billing error for event '${event.uid}' (${description}) is not a number!`,
-      );
-    } else {
-      log(`${startDateString} | ${billableHours.toFixed(2)} | ${description}`);
-      sum += billableHours;
-    }
+    log(
+      `${startTime.toDateString()} | ${billableHours.toFixed(2)} | ${description}`,
+    );
+    sum += billableHours;
+
     summarized_events.push({
       description,
       durationHours: billableHours,
       id: event.uid,
-      startTime: parseDate(event.dtstart),
+      startTime,
     });
   } // end of events loop
 
@@ -126,6 +172,6 @@ export default function summarizeHours({
 
   return {
     sum,
-    events: [...summarized_events],
+    events: summarized_events,
   };
 }
