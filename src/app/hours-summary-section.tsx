@@ -36,7 +36,7 @@ export default function HoursSummarySection({
       project,
       before,
     };
-  }, [after, project]);
+  }, [after, project, before]);
   const summary: ISummaryGenerationResult = useMemo(() => {
     if (process.env.NODE_ENV === "development") {
       console.log("Generating summary with filters:", filters);
@@ -46,7 +46,7 @@ export default function HoursSummarySection({
       log:
         process.env.NODE_ENV === "development"
           ? console.log
-          : (inputs: unknown[]) => {
+          : (): void => {
               /** No-op, don't log to console in production */
             },
       filters,

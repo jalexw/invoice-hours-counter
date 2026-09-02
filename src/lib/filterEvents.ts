@@ -1,5 +1,5 @@
 import type { IcsEvent } from "@jalexw/calendar-ics-parser";
-import parseDate from "./parseDate";
+import parseDate, { isValidDate } from "./parseDate";
 
 export interface IFilterOptions {
   project?: string | null;
@@ -8,8 +8,7 @@ export interface IFilterOptions {
 }
 
 function hasProjectPrefix(title: string, project: string): boolean {
-  let isValid: boolean = title.startsWith(`${project} -`);
-  if (isValid) {
+  if (title.startsWith(`${project} -`) || title.startsWith(`${project} |`)) {
     return true;
   }
 
@@ -39,13 +38,13 @@ function hasProjectPrefix(title: string, project: string): boolean {
     return true;
   }
 
-  if (!isValid && title.includes(project)) {
+  if (title.includes(project)) {
     console.warn(
       `⚠️ Title does not have project prefix but includes project name as a substring: '${title}'`,
     );
   }
 
-  return isValid;
+  return false;
 }
 
 export default function filterEvents(
@@ -64,24 +63,36 @@ export default function filterEvents(
     }
   }
 
-  if (options.after) {
-    if (!event.dtstart) {
+  if (isValidDate(options.after)) {
+    if (typeof event.dtstart !== "string") {
       console.warn(`No dtstart set for event '${event.summary}'`);
       return false;
     }
-    const startTime = parseDate(event.dtstart);
+    const startTime: Date = parseDate(event.dtstart);
+    if (!isValidDate(startTime)) {
+      console.warn(
+        `Unparseable dtstart '${event.dtstart}' for event '${event.summary}'`,
+      );
+      return false;
+    }
 
     if (startTime.getTime() < options.after.getTime()) {
       return false;
     }
   }
 
-  if (options.before) {
-    if (!event.dtend) {
+  if (isValidDate(options.before)) {
+    if (typeof event.dtend !== "string") {
       console.warn(`No dtend set for event '${event.summary}'`);
       return false;
     }
-    const endTime = parseDate(event.dtend);
+    const endTime: Date = parseDate(event.dtend);
+    if (!isValidDate(endTime)) {
+      console.warn(
+        `Unparseable dtend '${event.dtend}' for event '${event.summary}'`,
+      );
+      return false;
+    }
 
     if (endTime.getTime() > options.before.getTime()) {
       return false;
